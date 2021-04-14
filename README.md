@@ -4,6 +4,6 @@
 
 Сервис, в котором можно регистрироваться, авторизовываться, редактировать информацию о пользователе, выполнять поиск по фильмам и сохранять понравившиеся Вам фильмы.    
 
-[Movies-Explorer-API](api.movies.stamat.nomoredomains.icu).  
+[Movies-Explorer-API](https://api.movies.stamat.nomoredomains.icu).  
 
 Публичный IPv4: 178.154.205.44  
