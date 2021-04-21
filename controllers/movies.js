@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
 const Movie = require('../models/movie');
 const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
+const { messageDeletedMovie, messageUnknowMoveeId, messageOtherMovie } = require('../utils/constants');
 
 const getUserMovies = (req, res, next) => {
   Movie.find({ owner: req.user._id })
-    .populate(['owner'])
     .then((data) => {
       res.send(data);
     })
@@ -25,9 +25,21 @@ const createdMovie = (req, res, next) => {
     nameEN,
     thumbnail,
   } = req.body;
-  Movie.findOneAndUpdate(
-    { _id: mongoose.Types.ObjectId() },
-    {
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    movieId,
+    nameRU,
+    nameEN,
+    thumbnail,
+    owner: req.user._id,
+  })
+    .then(() => res.send({
       country,
       director,
       duration,
@@ -39,32 +51,29 @@ const createdMovie = (req, res, next) => {
       nameRU,
       nameEN,
       thumbnail,
-      owner: req.user._id,
-    },
-    {
-      new: true,
-      upsert: true,
-      runValidators: true,
-      setDefaultsOnInsert: true,
-      populate: ['owner'],
-    },
-  )
-    .then((data) => {
-      res.send(data);
-    })
+    }))
     .catch(next);
 };
 
 const deleteMovie = (req, res, next) => {
-  Movie.findOneAndDelete({
-    _id: req.params.movieId,
-    owner: req.user._id,
-  }).populate('owner')
-    .orFail(() => {
-      throw new NotFoundError('Нет фильма с таким id');
-    })
-    .then((data) => {
-      res.send(data);
+  const owner = req.user._id;
+  const { movieId } = req.params;
+
+  Movie.findById(movieId)
+    .select('+owner')
+    .then((movie) => {
+      if (!movie) {
+        throw new NotFoundError({ message: messageUnknowMoveeId });
+      }
+      if (movie.owner.toString() !== owner) {
+        throw new ForbiddenError({ message: messageOtherMovie });
+      } else {
+        Movie.findByIdAndDelete(movieId)
+          .then(() => {
+            res.status(200).send({ message: messageDeletedMovie });
+          })
+          .catch(next);
+      }
     })
     .catch(next);
 };

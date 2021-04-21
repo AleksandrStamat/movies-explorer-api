@@ -1,55 +1,57 @@
 const mongoose = require('mongoose');
 const isEmail = require('validator/lib/isEmail');
 const isStrongPassword = require('validator/lib/isStrongPassword');
-// const isLength = require('validator/lib/isLength');
 const bcrypt = require('bcryptjs');
 const AuthorizationError = require('../errors/AuthorizationError');
+const { messageInvalidEmail, messageInvalidPassword, messageInvalidEmailOrPassword } = require('../utils/constants');
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    require: [true, 'Поле "name" обязательно для заполнения.'],
-    minlength: 2,
-    maxlength: 30,
-  },
-  email: {
-    type: String,
-    require: [true, 'Поле "email" обязательно для заполнения.'],
-    unique: true,
-    validate: {
-      validator: (v) => isEmail(v),
-      message: 'Не верно указан адрес.',
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Поле "name" обязательно для заполнения.'],
+      minlength: 2,
+      maxlength: 30,
     },
-  },
-  password: {
-    type: String,
-    required: [true, 'Поле "password" обязательно для заполнения.'],
-    validate: {
-      validator(v) {
-        return isStrongPassword(v);
+    email: {
+      type: String,
+      required: [true, 'Поле "email" обязательно для заполнения.'],
+      unique: true,
+      validate: {
+        validator: (v) => isEmail(v),
+        message: messageInvalidEmail,
       },
-      message: 'Введен не корректный пароль',
     },
-    select: false,
+    password: {
+      type: String,
+      required: [true, 'Поле "password" обязательно для заполнения.'],
+      validate: {
+        validator(v) {
+          return isStrongPassword(v);
+        },
+        message: messageInvalidPassword,
+      },
+      select: false,
+    },
   },
-});
+  { versionKey: false },
+);
+
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
-    .select('+password')
-    .then((user) => {
-      if (!user) {
+  return this.findOne({ email }).select('+password').then((user) => {
+    if (!user) {
+      throw new AuthorizationError({
+        message: messageInvalidEmailOrPassword,
+      });
+    }
+    return bcrypt.compare(password, user.password).then((matched) => {
+      if (!matched) {
         throw new AuthorizationError({
-          message: 'Неправильные email или пароль',
+          message: messageInvalidEmailOrPassword,
         });
       }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          throw new AuthorizationError({
-            message: 'Неправильные email или пароль',
-          });
-        }
-        return user;
-      });
+      return user;
     });
+  });
 };
 module.exports = mongoose.model('user', userSchema);
