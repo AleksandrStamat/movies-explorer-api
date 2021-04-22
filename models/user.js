@@ -3,19 +3,26 @@ const isEmail = require('validator/lib/isEmail');
 const isStrongPassword = require('validator/lib/isStrongPassword');
 const bcrypt = require('bcryptjs');
 const AuthorizationError = require('../errors/AuthorizationError');
-const { messageInvalidEmail, messageInvalidPassword, messageInvalidEmailOrPassword } = require('../utils/constants');
+const {
+  messageInvalidEmail,
+  messageInvalidPassword,
+  messageInvalidEmailOrPassword,
+  messageNameRequired,
+  messageEmailRequired,
+  messagePasswordRequired,
+} = require('../utils/constants');
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Поле "name" обязательно для заполнения.'],
+      required: [true, messageNameRequired],
       minlength: 2,
       maxlength: 30,
     },
     email: {
       type: String,
-      required: [true, 'Поле "email" обязательно для заполнения.'],
+      required: [true, messageEmailRequired],
       unique: true,
       validate: {
         validator: (v) => isEmail(v),
@@ -24,7 +31,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Поле "password" обязательно для заполнения.'],
+      required: [true, messagePasswordRequired],
       validate: {
         validator(v) {
           return isStrongPassword(v);
@@ -40,15 +47,11 @@ const userSchema = new mongoose.Schema(
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password').then((user) => {
     if (!user) {
-      throw new AuthorizationError({
-        message: messageInvalidEmailOrPassword,
-      });
+      throw new AuthorizationError(messageInvalidEmailOrPassword);
     }
     return bcrypt.compare(password, user.password).then((matched) => {
       if (!matched) {
-        throw new AuthorizationError({
-          message: messageInvalidEmailOrPassword,
-        });
+        throw new AuthorizationError(messageInvalidEmailOrPassword);
       }
       return user;
     });

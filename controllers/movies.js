@@ -63,14 +63,14 @@ const deleteMovie = (req, res, next) => {
     .select('+owner')
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError({ message: messageUnknowMoveeId });
+        throw new NotFoundError(messageUnknowMoveeId);
       }
       if (movie.owner.toString() !== owner) {
-        throw new ForbiddenError({ message: messageOtherMovie });
+        throw new ForbiddenError(messageOtherMovie);
       } else {
         Movie.findByIdAndDelete(movieId)
           .then(() => {
-            res.status(200).send({ message: messageDeletedMovie });
+            res.status(200).send(messageDeletedMovie);
           })
           .catch(next);
       }

@@ -1,34 +1,58 @@
 const { celebrate, Joi } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
 const isURL = require('validator/lib/isURL');
+const {
+  messageNameRequired,
+  messageEmailRequired,
+  messagePasswordRequired,
+  messageCountryRequired,
+  messageDirectorRequired,
+  messageDurationRequired,
+  messageYearRequired,
+  messageDescriptionRequired,
+  messageImageRequired,
+  messageTrailerRequired,
+  messageThumbnailRequired,
+  messageMovieIdRequired,
+  messageNameRuRequired,
+  messageNameEnRequired,
+  messageInvalidEmail,
+  messageInvalidId,
+  messageMinLenghtName,
+  messageMaxLenghtName,
+  messageMinLenghtPassword,
+  messageImageUrl,
+  messageTrailerUrl,
+  messageThumbnailUrl,
+} = require('../utils/constants');
 
 const validateUserCreate = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30)
       .messages({
-        'any.required': 'Поле "name" обязательно для заполнения.',
-        'string.min': 'Минимальная длинная поля "name" - 2',
-        'string.max': 'Максимальная длинная поля "name" - 30',
+        'any.required': messageNameRequired,
+        'string.min': messageMinLenghtName,
+        'string.max': messageMaxLenghtName,
       }),
-    password: Joi.string().required().min(6).messages({
-      'any.required': 'Поле "password" обязательно для заполнения.',
-      'string.min': 'Минимальная длинная поля "password" - 6',
+    password: Joi.string().required().min(8).messages({
+      'any.required': messagePasswordRequired,
+      'string.min': messageMinLenghtPassword,
     }),
     email: Joi.string().required().email().messages({
-      'any.required': 'Поле "email" обязательно для заполнения.',
-      'string.email': 'Не верно указан адрес "email".',
+      'any.required': messageEmailRequired,
+      'string.email': messageInvalidEmail,
     }),
   }),
 });
 
 const validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).messages({
-      'string.min': 'Минимальная длинная поля "name" - 2',
-      'string.max': 'Максимальная длинная поля "name" - 30',
+    name: Joi.string().min(2).max(30).required().messages({
+      'string.min': messageMinLenghtName,
+      'string.max': messageMaxLenghtName,
     }),
-    email: Joi.string().email().messages({
-      'string.email': 'Не верно указан адрес "email".',
+    email: Joi.string().email().required().messages({
+      'string.email': messageInvalidEmail,
     }),
   }),
 });
@@ -36,12 +60,12 @@ const validateUserUpdate = celebrate({
 const validateAuthentication = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
-      'any.required': 'Поле "email" обязательно для заполнения.',
-      'string.email': 'Не верно указан адрес "email".',
+      'any.required': messageEmailRequired,
+      'string.email': messageInvalidEmail,
     }),
-    password: Joi.string().required().min(6).messages({
-      'any.required': 'Поле "password" обязательно для заполнения.',
-      'string.min': 'Минимальная длинная поля "password" - 6',
+    password: Joi.string().required().min(8).messages({
+      'any.required': messagePasswordRequired,
+      'string.min': messageMinLenghtPassword,
     }),
   }),
 });
@@ -52,7 +76,7 @@ const validateMovieId = celebrate({
       if (ObjectId.isValid(value)) {
         return value;
       }
-      return helpers.message('Невалидный id');
+      return helpers.message(messageInvalidId);
     }),
   }),
 });
@@ -60,19 +84,19 @@ const validateMovieId = celebrate({
 const validateMovie = celebrate({
   body: Joi.object().keys({
     country: Joi.string().required().messages({
-      'any.required': 'Поле "country" обязательно для заполнения.',
+      'any.required': messageCountryRequired,
     }),
     director: Joi.string().required().messages({
-      'any.required': 'Поле "director" обязательно для заполнения.',
+      'any.required': messageDirectorRequired,
     }),
     duration: Joi.number().required().messages({
-      'any.required': 'Поле "duration" обязательно для заполнения.',
+      'any.required': messageDurationRequired,
     }),
     year: Joi.string().required().messages({
-      'any.required': 'Поле "year" обязательно для заполнения.',
+      'any.required': messageYearRequired,
     }),
     description: Joi.string().required().messages({
-      'any.required': 'Поле "description" обязательно для заполнения.',
+      'any.required': messageDescriptionRequired,
     }),
     image: Joi.string()
       .required()
@@ -80,10 +104,10 @@ const validateMovie = celebrate({
         if (isURL(value)) {
           return value;
         }
-        return helpers.message('Поле "image" должно быть заполнено url-адресом.');
+        return helpers.message(messageImageUrl);
       })
       .messages({
-        'any.required': 'Поле "image" обязательно для заполнения.',
+        'any.required': messageImageRequired,
       }),
     trailer: Joi.string()
       .required()
@@ -91,10 +115,10 @@ const validateMovie = celebrate({
         if (isURL(value)) {
           return value;
         }
-        return helpers.message('Поле "trailer" должно быть заполнено url-адресом.');
+        return helpers.message(messageTrailerUrl);
       })
       .messages({
-        'any.required': 'Поле "trailer" обязательно для заполнения.',
+        'any.required': messageTrailerRequired,
       }),
     thumbnail: Joi.string()
       .required()
@@ -102,19 +126,19 @@ const validateMovie = celebrate({
         if (isURL(value)) {
           return value;
         }
-        return helpers.message('Поле "thumbnail" должно быть заполнено url-адресом.');
+        return helpers.message(messageThumbnailUrl);
       })
       .messages({
-        'any.required': 'Поле "thumbnail" обязательно для заполнения.',
+        'any.required': messageThumbnailRequired,
       }),
     movieId: Joi.number().required().messages({
-      'any.required': 'Поле "movieId" обязательно для заполнения.',
+      'any.required': messageMovieIdRequired,
     }),
     nameRU: Joi.string().required().messages({
-      'any.required': 'Поле "nameRU" обязательно для заполнения.',
+      'any.required': messageNameRuRequired,
     }),
     nameEN: Joi.string().required().messages({
-      'any.required': 'Поле "nameEN" обязательно для заполнения.',
+      'any.required': messageNameEnRequired,
     }),
   }),
 });

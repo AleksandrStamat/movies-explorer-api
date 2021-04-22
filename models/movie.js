@@ -1,32 +1,45 @@
 const mongoose = require('mongoose');
 const isUrl = require('validator/lib/isURL');
-const { messageInvalidLink } = require('../utils/constants');
+const {
+  messageInvalidLink,
+  messageCountryRequired,
+  messageDirectorRequired,
+  messageDurationRequired,
+  messageYearRequired,
+  messageDescriptionRequired,
+  messageImageRequired,
+  messageTrailerRequired,
+  messageThumbnailRequired,
+  messageMovieIdRequired,
+  messageNameRuRequired,
+  messageNameEnRequired,
+} = require('../utils/constants');
 
 const movieSchema = new mongoose.Schema(
   {
     country: {
       type: String,
-      required: [true, 'Поле "country" обязательно для заполнения.'],
+      required: [true, messageCountryRequired],
     },
     director: {
       type: String,
-      required: [true, 'Поле "director" обязательно для заполнения.'],
+      required: [true, messageDirectorRequired],
     },
     duration: {
       type: Number,
-      required: [true, 'Поле "duration" обязательно для заполнения.'],
+      required: [true, messageDurationRequired],
     },
     year: {
       type: String,
-      required: [true, 'Поле "year" обязательно для заполнения.'],
+      required: [true, messageYearRequired],
     },
     description: {
       type: String,
-      required: [true, 'Поле "description" обязательно для заполнения.'],
+      required: [true, messageDescriptionRequired],
     },
     image: {
       type: String,
-      required: [true, 'Поле "image" обязательно для заполнения.'],
+      required: [true, messageImageRequired],
       validate: {
         validator: (v) => isUrl(v),
         message: messageInvalidLink,
@@ -34,7 +47,7 @@ const movieSchema = new mongoose.Schema(
     },
     trailer: {
       type: String,
-      required: [true, 'Поле "trailer" обязательно для заполнения.'],
+      required: [true, messageTrailerRequired],
       validate: {
         validator: (v) => isUrl(v),
         message: messageInvalidLink,
@@ -42,7 +55,7 @@ const movieSchema = new mongoose.Schema(
     },
     thumbnail: {
       type: String,
-      required: [true, 'Поле "thumbnail" обязательно для заполнения.'],
+      required: [true, messageThumbnailRequired],
       validate: {
         validator: (v) => isUrl(v),
         message: messageInvalidLink,
@@ -55,15 +68,15 @@ const movieSchema = new mongoose.Schema(
     },
     movieId: {
       type: Number,
-      required: [true, 'Поле "movieId" обязательно для заполнения.'],
+      required: [true, messageMovieIdRequired],
     },
     nameRU: {
       type: String,
-      required: [true, 'Поле "nameRU" обязательно для заполнения.'],
+      required: [true, messageNameRuRequired],
     },
     nameEN: {
       type: String,
-      required: [true, 'Поле "nameEN" обязательно для заполнения.'],
+      required: [true, messageNameEnRequired],
     },
   },
   { versionKey: false },

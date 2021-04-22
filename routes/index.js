@@ -21,7 +21,7 @@ router.use('/users', auth, usersRouter);
 router.use('/movies', auth, movieRouter);
 
 router.all('*', () => {
-  throw new NotFoundError({ message: messageNotFoundError });
+  throw new NotFoundError(messageNotFoundError);
 });
 
 module.exports = router;

@@ -11,7 +11,7 @@ const getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: messageUnknowUserId });
+        throw new NotFoundError(messageUnknowUserId);
       }
       res.status(200).send({
         email: user.email,
@@ -39,9 +39,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
         next(
-          new ConflictError({
-            message: messageAlreadyRegistered,
-          }),
+          new ConflictError(messageAlreadyRegistered),
         );
         return;
       }
@@ -66,13 +64,21 @@ const updateUser = (req, res, next) => {
   const { name, email } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
     .then((user) => {
-      if (!user) throw new NotFoundError({ message: messageUnknowUser });
+      if (!user) throw new NotFoundError(messageUnknowUser);
       res.send({
         email: user.email,
         name: user.name,
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        next(
+          new ConflictError(messageAlreadyRegistered),
+        );
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports = {
