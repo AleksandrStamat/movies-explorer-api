@@ -47,10 +47,11 @@ const validateUserCreate = celebrate({
 
 const validateUserUpdate = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required().messages({
-      'string.min': messageMinLenghtName,
-      'string.max': messageMaxLenghtName,
-    }),
+    name: Joi.string().min(2).max(30).required()
+      .messages({
+        'string.min': messageMinLenghtName,
+        'string.max': messageMaxLenghtName,
+      }),
     email: Joi.string().email().required().messages({
       'string.email': messageInvalidEmail,
     }),
