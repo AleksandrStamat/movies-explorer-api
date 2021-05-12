@@ -73,12 +73,7 @@ const validateAuthentication = celebrate({
 
 const validateMovieId = celebrate({
   params: Joi.object().keys({
-    movieId: Joi.string().required().custom((value, helpers) => {
-      if (ObjectId.isValid(value)) {
-        return value;
-      }
-      return helpers.message(messageInvalidId);
-    }),
+    movieId: Joi.string().required(),
   }),
 });
 

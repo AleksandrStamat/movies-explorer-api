@@ -58,8 +58,7 @@ const createdMovie = (req, res, next) => {
 const deleteMovie = (req, res, next) => {
   const owner = req.user._id;
   const { movieId } = req.params;
-
-  Movie.findById(movieId)
+  Movie.findOne({ movieId })
     .select('+owner')
     .then((movie) => {
       if (!movie) {
@@ -68,9 +67,9 @@ const deleteMovie = (req, res, next) => {
       if (movie.owner.toString() !== owner) {
         throw new ForbiddenError(messageOtherMovie);
       } else {
-        Movie.findByIdAndDelete(movieId)
+        Movie.deleteOne({ movieId })
           .then(() => {
-            res.status(200).send(messageDeletedMovie);
+            res.status(200).send({ message: messageDeletedMovie });
           })
           .catch(next);
       }
