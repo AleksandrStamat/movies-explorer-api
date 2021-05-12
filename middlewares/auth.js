@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    throw new AuthorizationError({ message: messageLogIn });
+    throw new AuthorizationError(messageLogIn);
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, `${NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret'}`);
   } catch (err) {
-    throw new AuthorizationError({ message: messageLogIn });
+    throw new AuthorizationError(messageLogIn);
   }
   req.user = payload;
 
