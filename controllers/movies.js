@@ -58,7 +58,7 @@ const createdMovie = (req, res, next) => {
 const deleteMovie = (req, res, next) => {
   const owner = req.user._id;
   const { movieId } = req.params;
-  Movie.findOne({ movieId })
+  Movie.findOne({ movieId, owner })
     .select('+owner')
     .then((movie) => {
       if (!movie) {
