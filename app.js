@@ -12,7 +12,6 @@ const rateLimiter = require('./middlewares/rateLimit');
 const routes = require('./routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { urlDB } = require('./utils/config');
-const { test } = require('./utils/telegram');
 const { PORT = 3000, NODE_ENV, MONGO_URL } = process.env;
 const app = express();
 
@@ -24,7 +23,7 @@ mongoose
     useFindAndModify: false,
     autoIndex: true,
   })
-  .then(() => test('Connected to MoviesExplorerDB'));
+  .then(() => console.log('Connected to MoviesExplorerDB'));
 
 app.use(requestLogger);
 app.use(rateLimiter);
